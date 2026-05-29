@@ -6,3 +6,8 @@ build
 coverage
 *.log
 .DS_Store
+
+# SQLite database files (created by Prisma)
+*.db
+*.db-journal
+prisma/dev.db
