@@ -1,0 +1,59 @@
+// Prisma schema for LinkTrack
+// Three tables: users, urls, clicks
+// Run `npx prisma migrate dev --name init` after editing.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+
+  urls Url[]
+
+  @@map("users")
+}
+
+model Url {
+  id          String    @id @default(uuid())
+  userId      String
+  originalUrl String
+  shortCode   String    @unique
+  customAlias String?   @unique
+  title       String?
+  isActive    Boolean   @default(true)
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clicks Click[]
+
+  @@index([userId])
+  @@map("urls")
+}
+
+model Click {
+  id        String   @id @default(uuid())
+  urlId     String
+  ipAddress String?
+  userAgent String?
+  browser   String?
+  device    String?
+  country   String?
+  clickedAt DateTime @default(now())
+
+  url Url @relation(fields: [urlId], references: [id], onDelete: Cascade)
+
+  @@index([urlId])
+  @@index([clickedAt])
+  @@map("clicks")
+}
